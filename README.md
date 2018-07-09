@@ -4,7 +4,7 @@ A simple website URL and link checker. It crawls through a given sitemap for eve
 
 ## Setup 
 
-It is reccomended to use a virtual environment with this package, although it is not essential.
+It is recommended to use a virtual environment with this package, although it is not essential.
 
 To install the required packages use `pip`:
 `pip install -r requirements.txt`
