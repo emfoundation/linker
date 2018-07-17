@@ -10,6 +10,16 @@ To install the required packages use `pip`:
 `pip install -r requirements.txt`
 
 ## Usage
+### Graphical interface
+Enter the linker directory, and run:
+`python main.py`
+
+From here you can enter or browse for the filename of the XML sitemap, and click enter. 
+
+#### HTTP Auth
+If your site has a username and password, 
+
+### Command Line
 To run the script, ensure you have python (min <2.7) installed and run:
 `python linker.py`
 
