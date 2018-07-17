@@ -1,4 +1,3 @@
-import linker, gui
+import gui
 
 gui.run()
-linker.run()

@@ -1,0 +1,7 @@
+# Python files
+__pycache__
+*.pyc
+*.xml
+
+# Application files
+error_results.txt
