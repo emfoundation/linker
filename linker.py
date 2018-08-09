@@ -106,6 +106,18 @@ def check_links(site_map_file, auth=None):
             
     
     return broken_links
+def download_map(url):
+ # Download XML sitemap from given web address and save to file
+    site_map_file = 'xml_sitemap.xml'
+    try: 
+        # Get the xml map from the site
+        xml = requests.get(url, stream=True)
+        with open(site_map_file, 'w') as file:
+            file.write(xml.text)
+        
+        return site_map_file
+    except: 
+        raise SystemExit("Could not download the xml file, please try again.")
 
 # Allows command line running
 def run():
@@ -116,15 +128,9 @@ def run():
         print("Enter the filename for the XML sitemap, include extension:")
         site_map_file = input()
     else: 
-        # Download XML file from site
-        try: 
-            xml = requests.get(url, stream=True)
-            with open('xml_sitemap.xml', 'w') as file:
-                file.write(xml.text)
-            site_map_file = 'xml_sitemap.xml'
-        except: 
-            raise SystemExit("Could not download the xml file, please try again.")
-
+        site_map_file = download_map(url)
+       
+    check_links(site_map_file)
 
 if __name__ == "__main__":
     run()
