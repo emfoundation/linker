@@ -21,7 +21,7 @@ class AuthDialog():
         self.auth_pass.grid(row=1, column=1)
 
         self.b = ttk.Button(self.win, text="Enter", command=self.return_auth)
-        self.b.grid(row=1, column=0)
+        self.b.grid(row=2, column=1)
 
     def return_auth(self):
         print("clicked")
@@ -73,32 +73,38 @@ class LinkerGUI(tk.Frame):
         # Set title of window
         self.winfo_toplevel().title("Linker")
 
+        self.title = tk.Label(self, font='Helvetica 18', text="Linker - The broken link finder")
+        self.title.grid(row=0, columnspan=3, pady=20)
+
+        self.intro_text = tk.Label(self, font='Helvetica 18', wraplength=600, text="To get started, browse for the file or enter the filename manually (with .xml extension) and click enter. \n The results will be outputted to the terminal immediately, and to a text file + listbox below after")
+        self.intro_text.grid(row=1, columnspan=3, rowspan=2, pady=20)
+
         self.filename_label = tk.Label(self,text="Filename")
-        self.filename_label.grid(row=0)
+        self.filename_label.grid(row=3)
 
         self.file_input = tk.Entry(self)
-        self.file_input.grid(row=0, column=1)
+        self.file_input.grid(row=3, column=1)
         
         self.results = tk.Listbox(self)
-        self.results.config(width=70)
-        self.results.grid(row=1, column=0, columnspan=3)
+        self.results.config(width=70, height=25)
+        self.results.grid(row=4, padx=25, pady=25, column=0, columnspan=3)
 
         # ====== Buttons ====== #
         # Browse
         self.browse = tk.Button(self)
         self.browse["text"] = "Browse..."
         self.browse["command"] = self.browse_file
-        self.browse.grid(row=0, column=2)
+        self.browse.grid(row=3, column=2)
 
         # Quit
         self.QUIT = tk.Button(self, text="QUIT", fg="red", command=self.quit)
-        self.QUIT.grid(row=3, column=0)
+        self.QUIT.grid(row=5, pady=10, column=0)
 
         # Enter
         self.enter = tk.Button(self)
         self.enter["text"] = "Enter"
         self.enter["command"] = self.get_broken_links
-        self.enter.grid(row=3, column=2)
+        self.enter.grid(row=5, pady=10, column=2)
 
 
 def run():
