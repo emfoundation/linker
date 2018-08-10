@@ -3,5 +3,8 @@ __pycache__
 *.pyc
 *.xml
 
+# Generated files
+broken_link_output.txt
+
 # Application files
-error_results.txt
+config.ini
