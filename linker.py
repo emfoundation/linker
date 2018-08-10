@@ -1,6 +1,13 @@
+import configparser
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup as Soup
+
 
 def check_links(site_map_file, auth=None):
     tree = ET.parse(site_map_file)
@@ -91,24 +98,12 @@ def check_links(site_map_file, auth=None):
                         broken_links.append((link_url, status_code, url))
                 else: 
                     continue
-    # Outputs results to a file and terminal, returns results
-    with open('error_results.txt', 'w') as file:
-        for url, error, location in broken_links:
-            broken_link = """
-                ===== BROKEN LINK ============
-                Broken Link Path: {}
-                Location: {}
-                Error: {}
-                ==============================
-            """.format(str(url), str(location), str(error))
-            print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
-            file.write(broken_link)
             
-    
     return broken_links
+
 def download_map(url):
  # Download XML sitemap from given web address and save to file
-    site_map_file = 'xml_sitemap.xml'
+    site_map_file = 'tmp_sitemap.xml'
     try: 
         # Get the xml map from the site
         xml = requests.get(url, stream=True)
@@ -119,18 +114,85 @@ def download_map(url):
     except: 
         raise SystemExit("Could not download the xml file, please try again.")
 
+
+def send_mail(config, subject, message):
+    """
+    sends an email from using the EMAIL config in config.ini
+    """
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(config['AdminEmailAddress'], config['AdminEmailPassword'])
+
+    msg = MIMEMultipart()
+    msg['From'] = config['AdminEmailAddress']
+    msg['To'] = config['RecipientEmailAddress']
+    msg['Subject'] = subject
+
+    body = message
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    txt = msg.as_string()
+    server.sendmail(config['AdminEmailAddress'], config['RecipientEmailAddress'], txt)
+    server.quit()
+
+
 # Allows command line running
 def run():
-    print("Enter sitemap url - ie, https://www.google.com/sitemap.xml [Leave blank to use local file]:")
-    url = input()
+    config = configparser.ConfigParser()
+    config.read('config.ini')
 
-    if url == '':
-        print("Enter the filename for the XML sitemap, include extension:")
-        site_map_file = input()
-    else: 
-        site_map_file = download_map(url)
-       
-    check_links(site_map_file)
+    gen_conf = config['GENERAL']
+    email_conf = config['EMAIL']
+
+    # Local file
+    if gen_conf['UseLocalFile'] == 'yes':
+        site_map_file = gen_conf['LocalSitemapFile']
+
+    # Download sitemap from given url
+    elif gen_conf['DownloadSitemap'] == 'yes':
+        site_map_file = download_map(gen_conf['RemoteSitemapUrl'])
+
+    # Check links
+    if os.path.exists(site_map_file):
+        broken_links = check_links(site_map_file)
+    else:
+        print("The file at {} could not be found. Please check the config and ensure the filepath is correct.".format(site_map_file))
+    
+    # If sitemap was downloaded, remove
+    try:
+        os.remove('tmp_sitemap.xml')
+    except FileNotFoundError:
+        pass
+
+
+    ###### Output ######
+    # Outputs results to a file, the terminal and via email
+
+    count_broken_links = len(broken_links)
+    subject = "ALERT: {} Broken Links detected for {}".format(count_broken_links, email_conf['SiteName'])
+    message = "There were {} broken links found! \n".format(count_broken_links)
+    
+    # Formats the links into a human readable format, writes to file and generates message
+    for url, error, location in broken_links:
+        broken_link = """
+            ===== BROKEN LINK ============
+            Broken Link Path: {}
+            Location: {}
+            Error: {}
+            ==============================
+        """.format(str(url), str(location), str(error))
+        print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
+        message += broken_link
+    
+    # Write to file
+    if gen_conf['OutputToFile'] == 'yes':
+        with open(gen_conf['OutputFileName'], 'w') as file:
+            file.write(message)
+
+    # Email output
+    if email_conf['EmailOutput'] == 'yes':
+        send_mail(email_conf, subject, message)
 
 if __name__ == "__main__":
     run()
