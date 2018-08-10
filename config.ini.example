@@ -16,6 +16,8 @@ OutputFileName=broken_link_output.txt
 [EMAIL]
 SiteName=
 EmailOutput=yes
+
 AdminEmailAddress=
 AdminEmailPassword=
+
 RecipientEmailAddress=

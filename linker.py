@@ -1,6 +1,8 @@
 import configparser
 import os
 import smtplib
+import datetime
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -168,29 +170,44 @@ def run():
 
     ###### Output ######
     # Outputs results to a file, the terminal and via email
+    scan_date = datetime.datetime.now().strftime("%c")
 
     count_broken_links = len(broken_links)
-    subject = "ALERT: {} Broken Links detected for {}".format(count_broken_links, email_conf['SiteName'])
-    message = "There were {} broken links found! \n".format(count_broken_links)
+    # count_broken_links = 0
+    if count_broken_links > 0:
+        subject = "ALERT: Site Report for {} - {} Broken Links detected".format(email_conf['SiteName'], count_broken_links)
+        message = """
+        Linker Scan - FAILED, Broken links found
+        Site: {}
+        Date Scanned: {}
+        No. Broken Links: {} \n
+        """.format(email_conf["SiteName"], scan_date, count_broken_links)
     
-    # Formats the links into a human readable format
-    for url, error, location in broken_links:
-        broken_link = """
-            ===== BROKEN LINK ============
-            Broken Link Path: {}
-            Location: {}
-            Error: {}
-            ==============================
-        """.format(str(url), str(location), str(error))
-        print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
-        message += broken_link
-    
-    # Writes to file
-    if gen_conf['OutputToFile'] == 'yes':
-        with open(gen_conf['OutputFileName'], 'w') as file:
-            file.write(message)
+        # Formats the links into a human readable format
+        for url, error, location in broken_links:
+            broken_link = """
+                ===== BROKEN LINK ============
+                Destination: {}
+                Location: {}
+                Error: {}
+                ==============================
+            """.format(str(url), str(location), str(error))
+            print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
+            message += broken_link
+        
+        # Writes to file
+        if gen_conf['OutputToFile'] == 'yes':
+            with open(gen_conf['OutputFileName'], 'w') as file:
+                file.write(message)
+    else:
+        # Emails the output to address specified in config.ini
+        subject = "PASSED: Site Report for {} - No Broken Links detected".format(email_conf['SiteName'])
+        message = """
+        Linker Scan - PASSED, No broken links found
+        Site: {}
+        Date Scanned: {}
+        """.format(email_conf['SiteName'], scan_date)
 
-    # Emails the output to address specified in config.ini
     if email_conf['EmailOutput'] == 'yes':
         send_mail(email_conf, subject, message)
 
