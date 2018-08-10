@@ -1,3 +1,5 @@
+ ;COPY THE CONTENTS OF THIS EXAMPLE INTO A "config.ini" FILE
+
 [OPTIONS]
 ;Use exisiting sitemap on system, include xml extension
 UseLocalFile=yes

@@ -173,7 +173,7 @@ def run():
     subject = "ALERT: {} Broken Links detected for {}".format(count_broken_links, email_conf['SiteName'])
     message = "There were {} broken links found! \n".format(count_broken_links)
     
-    # Formats the links into a human readable format, writes to file and generates message
+    # Formats the links into a human readable format
     for url, error, location in broken_links:
         broken_link = """
             ===== BROKEN LINK ============
@@ -185,12 +185,12 @@ def run():
         print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
         message += broken_link
     
-    # Write to file
+    # Writes to file
     if gen_conf['OutputToFile'] == 'yes':
         with open(gen_conf['OutputFileName'], 'w') as file:
             file.write(message)
 
-    # Email output
+    # Emails the output to address specified in config.ini
     if email_conf['EmailOutput'] == 'yes':
         send_mail(email_conf, subject, message)
 
