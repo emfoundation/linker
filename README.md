@@ -16,26 +16,28 @@ To run the script, ensure you have python (min <2.7) installed and run:
 
 Copy the contents of the `config.ini.example` file into `config.ini` in the same directory. 
 
-Modify your config file with the details for your site. 
+Modify your config file with the details for your site:
 
-*GENERAL*
-Config option | Description
-------------- | -----------
-UseLocalFile  | yes(default)/no
+**GENERAL CONFIG**
+
+|Config option|Description|
+|-------------|-----------|
+UseLocalFile|yes (default) / no
 LocalSitemapFile | File path + name relative to this directory
-DownloadSitemap | yes/no(default)
+DownloadSitemap | yes / no (default)
 RemoteSitemapUrl | The url of the sitemap hosted on your website
-OutputToFile | yes(default)/no
+OutputToFile | yes (default) / no
 OutputFileName | Name of the file that the results will store. Can be placed elsewhere using relative path
 
-*GENERAL*
-Config option | Description
-------------- | -----------
-SiteName      | The name of your site, this is for display only and gets used in the output for easier identification
-EmailOutput | yes/no(default)
-AdminEmailAddress | The address of that emails will be sent from
-AdminEmailPassword | The password of the Admins email account *PLAIN TEXT!*
-RecipientEmailAddress | The recipient's email where the output gets sent to
+**EMAIL CONFIG**
+
+|Config option|Description|
+|-------------|-----------|
+SiteName|The name of your site, this is for display only and gets used in the output for easier identification
+EmailOutput|yes / no (default)
+AdminEmailAddress|The address of that emails will be sent from
+AdminEmailPassword|The password of the Admins email account *PLAIN TEXT!*
+RecipientEmailAddress|The recipient's email where the output gets sent to
 
 ### Graphical interface
 Enter the linker directory, and run:
