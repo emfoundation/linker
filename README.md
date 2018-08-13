@@ -15,7 +15,7 @@ Copy the contents of the `config.ini.example` file into `config.ini` in the same
 
 Modify your config file with the details for your site:
 
-**GENERAL CONFIG**
+#### GENERAL CONFIG
 
 |Config option|Description|
 |-------------|-----------|
@@ -29,16 +29,16 @@ OutputFileName | Name of the file that the results will store. Can be placed els
 LogfileDirectory| The directory where logs will be saved, ensure you have the correct permissions for the directory. The script will a directories per site, ie: `<LogFileDirectory>/linker/<SiteName>/<date-of-scan>`
 
 
-**EMAIL CONFIG**
+#### EMAIL CONFIG
 
 |Config option|Description|
 |-------------|-----------|
 EmailOutput|yes / no (default)
 AdminEmailAddress|The address of that emails will be sent from
-AdminEmailPassword|The password of the Admins email account *PLAIN TEXT!*
+AdminEmailPassword|The password of the Admins email account -> **PLAIN TEXT!**
 RecipientEmailAddress|The recipient's email where the output gets sent to
 
-**AUTH CONFIG**
+#### AUTH CONFIG
 
 For sites that are protected behind a username and password, you can authenticate by providing the username and password in the config. 
 
@@ -47,7 +47,7 @@ For sites that are protected behind a username and password, you can authenticat
 |Config option|Description|
 |-------------|-----------|
 SiteUsername| The username for the protected site
-SitePassword| The password for the protected site **Plain Text**
+SitePassword| The password for the protected site -> **Plain Text**
 
 
 To run the script, ensure you have python (min <2.7) installed and run:
