@@ -1,5 +1,5 @@
 import configparser
-import os
+import os, sys
 import smtplib
 import datetime
 
@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup as Soup
 
+import logging
 
 def check_links(site_map_file, auth=None):
     tree = ET.parse(site_map_file)
@@ -22,18 +23,21 @@ def check_links(site_map_file, auth=None):
     checked_links = []
     site_url = root[0][0].text
     print(site_url)
+    logging.info(site_url)
 
     try:
         if auth:
-            print(auth)
             r = requests.get(site_url, auth=(auth[0], auth[1]))
         else:
             r = requests.get(site_url)
     except:
-        print("Could not reach site")
+        log = "Could not reach site"
+        print(log)
+        logging.error(log)
         quit
     
     if r.status_code == 401:
+        logging.error("Received a 401 error from the site, try adding auth into the config.ini and retry")
         return 401
     # Loop over every <url> tag from the site map
     for page_index, page in enumerate(root):
@@ -43,8 +47,9 @@ def check_links(site_map_file, auth=None):
         url.encode('utf-8')
 
         if (url not in checked_links) and ("/assets" not in url):
-            print('Page {} of {} | Checking url [{}]'.format(page_index + 1, url_count, url))
-
+            log = 'Page {} of {} | Checking url [{}]'.format(page_index + 1, url_count, url)
+            print(log)
+            logging.info(log)
             try:
                 if auth:
                     r = requests.get(url, auth=(auth[0], auth[1]))
@@ -52,13 +57,17 @@ def check_links(site_map_file, auth=None):
                     r = requests.get(url)
 
             except: 
-                print("Uh oh, something went wrong checking {}".format(url))
+                log = "Uh oh, something went wrong checking {}".format(url)
+                print(log)
+                logging.info(log)
                 broken_links.append((url, "Unknown error", url))
 
             status_code = r.status_code
                 
             if status_code != 200:
-                print('Non-OK response ({}) on url: {}'.format(url,status_code))
+                log = 'Non-OK response ({}) for url: {}'.format(status_code,url)
+                print(log)
+                logging.info(log)
                 broken_links.append((url, status_code, url))
 
             checked_links.append(url)
@@ -76,31 +85,42 @@ def check_links(site_map_file, auth=None):
                     checked_links.append(link_url)
 
                     # Allows for links that are relative, ie - /contact
-                    if link_url and not (link_url.startswith("http") or link_url.startswith("mailto:")):
+                    if link_url and not (link_url.startswith("http")):
                         if link_url.startswith("/"):
                             link_url = site_url[0:-1] + link_url
+                        elif link_url.startswith("mailto:"):
+                            continue
                         else:
                             link_url = site_url + link_url
 
-                    print('Page {} of {} | Link {} of {} | Checking url [{}]'.format(page_index + 1, url_count, link_index + 1, links_count, link_url))
+                    log = 'Page {} of {} | Link {} of {} | Checking url [{}]'.format(page_index + 1, url_count, link_index + 1, links_count, link_url)
+                    print(log)
+                    logging.info(log)
                     try:
                         if auth:
                             r = requests.get(link_url, auth=(auth[0],auth[1]))
                         else:
                             r = requests.get(link_url)
                     except: 
-                        print("Uh oh, something went wrong checking {}".format(link_url))
+                        log = "Uh oh, something went wrong checking {}".format(link_url)
+                        print(log)
+                        logging.info(log)
+
                         if link_url == '':
                             link_url = link
-                        broken_links.append((link_url, "Unknown error", url))
+                        else:
+                            broken_links.append((link_url, "Unknown error", url))
+
                     status_code = r.status_code
                     if status_code != 200:
-                        print('Non-OK response ({}) on link_url: {}'.format(link_url,status_code))
-                        print(link)
+                        log = 'Non-OK response ({}) at the link url: {}'.format(status_code,link_url)
+                        print(log)
+                        logging.info(log)
+
                         broken_links.append((link_url, status_code, url))
                 else: 
                     continue
-            
+    
     return broken_links
 
 def download_map(url):
@@ -114,7 +134,9 @@ def download_map(url):
         
         return site_map_file
     except: 
-        raise SystemExit("Could not download the xml file, please try again.")
+        log = "Could not download the xml file, please try again."
+        logging.error(log)
+        raise sys.exit(log)
 
 
 def send_mail(config, subject, message):
@@ -146,20 +168,45 @@ def run():
 
     gen_conf = config['GENERAL']
     email_conf = config['EMAIL']
+    auth_conf = config['AUTH']
+    auth = (auth_conf['SiteUsername'],auth_conf['SitePassword'])
 
+    scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+    log_file_path = '{}/linker/{}/'.format(gen_conf['LogFileDirectory'], gen_conf['SiteName'])
+    log_file_name = scan_date
+    os.makedirs(log_file_path, exist_ok=True)
+
+    logging.basicConfig(
+        filename=log_file_path + log_file_name,
+        level=logging.INFO,
+        format=' %(asctime)s - %(levelname)s - %(message)s'
+    )
+ 
     # Local file
     if gen_conf['UseLocalFile'] == 'yes':
         site_map_file = gen_conf['LocalSitemapFile']
-
-    # Download sitemap from given url
     elif gen_conf['DownloadSitemap'] == 'yes':
         site_map_file = download_map(gen_conf['RemoteSitemapUrl'])
-
+    else: 
+        log = "Please specify either a local sitemap, or the address to download it remotely."
+        logging.error(log)
+        sys.exit(log)
+    
     # Check links
     if os.path.exists(site_map_file):
-        broken_links = check_links(site_map_file)
+        if auth != ('', ''):
+            broken_links = check_links(site_map_file, auth)
+        else:
+            broken_links = check_links(site_map_file)
+
+        if broken_links == 401:
+            sys.exit("The site you are trying to check requires authenticating. Please add the auth details in the config.ini file and try again.")
+    
     else:
-        print("The file at {} could not be found. Please check the config and ensure the filepath is correct.".format(site_map_file))
+        log = "The file at {} could not be found. Please check the config and ensure the filepath is correct.".format(site_map_file)
+        logging.error(log)
+        sys.exit(log)
     
     # If sitemap was downloaded, remove
     try:
@@ -170,18 +217,16 @@ def run():
 
     ###### Output ######
     # Outputs results to a file, the terminal and via email
-    scan_date = datetime.datetime.now().strftime("%c")
-
     count_broken_links = len(broken_links)
-    # count_broken_links = 0
+
     if count_broken_links > 0:
-        subject = "ALERT: Site Report for {} - {} Broken Links detected".format(email_conf['SiteName'], count_broken_links)
+        subject = "ALERT: Site Report for {} - {} Broken Links detected".format(gen_conf['SiteName'], count_broken_links)
         message = """
         Linker Scan - FAILED, Broken links found
         Site: {}
         Date Scanned: {}
         No. Broken Links: {} \n
-        """.format(email_conf["SiteName"], scan_date, count_broken_links)
+        """.format(gen_conf["SiteName"], scan_date, count_broken_links)
     
         # Formats the links into a human readable format
         for url, error, location in broken_links:
@@ -193,6 +238,7 @@ def run():
                 ==============================
             """.format(str(url), str(location), str(error))
             print( "Error: ", str(error), "  =>  URL: ", str(url), "Location: ", str(location))
+            logging.info(broken_link)
             message += broken_link
         
         # Writes to file
@@ -201,12 +247,12 @@ def run():
                 file.write(message)
     else:
         # Emails the output to address specified in config.ini
-        subject = "PASSED: Site Report for {} - No Broken Links detected".format(email_conf['SiteName'])
+        subject = "PASSED: Site Report for {} - No Broken Links detected".format(gen_conf['SiteName'])
         message = """
         Linker Scan - PASSED, No broken links found
         Site: {}
         Date Scanned: {}
-        """.format(email_conf['SiteName'], scan_date)
+        """.format(gen_conf['SiteName'], scan_date)
 
     if email_conf['EmailOutput'] == 'yes':
         send_mail(email_conf, subject, message)
