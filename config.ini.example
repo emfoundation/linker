@@ -1,9 +1,12 @@
  ;COPY THE CONTENTS OF THIS EXAMPLE INTO A "config.ini" FILE
 
 [OPTIONS]
-;Use exisiting sitemap on system, include xml extension
+;Used in logging & email reports
+SiteName=
+
+;Use an exisiting sitemap on system, include the xml extension
 UseLocalFile=yes
-LocalSitemapFile=public/sitemap.xml
+LocalSitemapFile=../public/sitemap.xml
 
 ;Downloads and uses the sitemap from the given url (ie, google.com/sitemap.xml)
 DownloadSitemap=no
@@ -12,12 +15,18 @@ RemoteSitemapUrl=
 OutputToFile=yes
 OutputFileName=broken_link_output.txt
 
+;Logging - The directory where logs will be stored
+LogfileDirectory=./log
+
 ;Emails the results to the Recipient address from the Admin address
 [EMAIL]
-SiteName=
 EmailOutput=yes
 
 AdminEmailAddress=
 AdminEmailPassword=
 
 RecipientEmailAddress=
+
+[AUTH]
+SiteUsername=
+SitePassword=

@@ -11,33 +11,47 @@ To install the required packages use `pip`:
 
 ## Usage
 ### Command Line & Server side
-To run the script, ensure you have python (min <2.7) installed and run:
-`python linker.py`
-
 Copy the contents of the `config.ini.example` file into `config.ini` in the same directory. 
 
 Modify your config file with the details for your site:
 
-**GENERAL CONFIG**
+#### GENERAL CONFIG
 
 |Config option|Description|
 |-------------|-----------|
+SiteName|The name of your site, this is for display only and gets used in the output for easier identification
 UseLocalFile|yes (default) / no
 LocalSitemapFile | File path + name relative to this directory
 DownloadSitemap | yes / no (default)
 RemoteSitemapUrl | The url of the sitemap hosted on your website
 OutputToFile | yes (default) / no
 OutputFileName | Name of the file that the results will store. Can be placed elsewhere using relative path
+LogfileDirectory| The directory where logs will be saved, ensure you have the correct permissions for the directory. The script will a directories per site, ie: `<LogFileDirectory>/linker/<SiteName>/<date-of-scan>`
 
-**EMAIL CONFIG**
+
+#### EMAIL CONFIG
 
 |Config option|Description|
 |-------------|-----------|
-SiteName|The name of your site, this is for display only and gets used in the output for easier identification
 EmailOutput|yes / no (default)
 AdminEmailAddress|The address of that emails will be sent from
-AdminEmailPassword|The password of the Admins email account *PLAIN TEXT!*
+AdminEmailPassword|The password of the Admins email account -> **PLAIN TEXT!**
 RecipientEmailAddress|The recipient's email where the output gets sent to
+
+#### AUTH CONFIG
+
+For sites that are protected behind a username and password, you can authenticate by providing the username and password in the config. 
+
+**WARNING** These are stored in plain text, so the right priviledges should be granted to keep them as secure as possible. 
+
+|Config option|Description|
+|-------------|-----------|
+SiteUsername| The username for the protected site
+SitePassword| The password for the protected site -> **Plain Text**
+
+
+To run the script, ensure you have python (min <2.7) installed and run:
+`python linker.py`
 
 ### Graphical interface
 Enter the linker directory, and run:
