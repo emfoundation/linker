@@ -8,3 +8,4 @@ broken_link_output.txt
 
 # Application files
 config.ini
+/log/*
