@@ -1,6 +1,7 @@
 # linker
 A simple website URL and link checker. It crawls through a given sitemap for every accessible URL, checks that the response is 200 (OK). It then procedes to check every link in the html of that page. 
 
+This script does not create the sitemap for you, so for that you can a website such as https://freesitemapgenerator.com/ or https://www.xml-sitemaps.com/.
 
 ## Setup 
 
