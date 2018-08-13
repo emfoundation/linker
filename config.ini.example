@@ -1,6 +1,6 @@
  ;COPY THE CONTENTS OF THIS EXAMPLE INTO A "config.ini" FILE
 
-[OPTIONS]
+[GENERAL]
 ;Used in logging & email reports
 SiteName=
 
