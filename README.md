@@ -12,7 +12,7 @@ To install the required packages use `pip`:
 
 ## Usage
 ### Command Line & Server side
-Copy the contents of the `config.ini.example` file into `config.ini` in the same directory. 
+Copy the contents of the `conf/conf.ini.example` file into `conf/conf.ini` in the same directory. 
 
 Modify your config file with the details for your site:
 
@@ -37,7 +37,7 @@ LogfileDirectory| The directory where logs will be saved, ensure you have the co
 EmailOutput|yes / no (default)
 AdminEmailAddress|The address of that emails will be sent from
 AdminEmailPassword|The password of the Admins email account -> **PLAIN TEXT!**
-RecipientEmailAddress|The recipient's email where the output gets sent to
+RecipientEmailAddresses|The recipient(s) email where the output gets sent to. Separate multiple emails with ','
 
 #### AUTH CONFIG
 
@@ -52,11 +52,18 @@ SitePassword| The password for the protected site -> **Plain Text**
 
 
 To run the script, ensure you have python (min <2.7) installed and run:
-`python linker.py`
+`python3 linker.py`
+
+#### MULTI CONFIGS
+You can pass the config file name as a Command line argument, this is useful for multiple sites with a config for each site. ie: 
+
+`python3 linker.py mysite.ini`
+
+`python3 linker.py mysecondsite.ini`
 
 ### Graphical interface
 Enter the linker directory, and run:
-`python main.py`
+`python3 main.py`
 
 From here you can enter or browse for the filename of the XML sitemap, and click enter. 
 

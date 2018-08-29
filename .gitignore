@@ -7,5 +7,5 @@ __pycache__
 broken_link_output.txt
 
 # Application files
-config.ini
 /log/*
+/conf/*
