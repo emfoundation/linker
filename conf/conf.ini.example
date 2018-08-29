@@ -25,7 +25,8 @@ EmailOutput=yes
 AdminEmailAddress=
 AdminEmailPassword=
 
-RecipientEmailAddress=
+;Recipient addresses, separated by ','
+RecipientEmailAddresses=
 
 [AUTH]
 SiteUsername=

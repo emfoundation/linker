@@ -146,10 +146,10 @@ def send_mail(config, subject, message):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(config['AdminEmailAddress'], config['AdminEmailPassword'])
-
+    recipients = config['RecipientEmailAddresses']
     msg = MIMEMultipart()
     msg['From'] = config['AdminEmailAddress']
-    msg['To'] = config['RecipientEmailAddress']
+    msg['To'] = recipients
     msg['Subject'] = subject
 
     body = message
@@ -157,19 +157,29 @@ def send_mail(config, subject, message):
     msg.attach(MIMEText(body, 'plain'))
 
     txt = msg.as_string()
-    server.sendmail(config['AdminEmailAddress'], config['RecipientEmailAddress'], txt)
+    server.sendmail(config['AdminEmailAddress'], recipients.split(','), txt)
     server.quit()
 
 
 # Allows command line running
 def run():
-    config = configparser.ConfigParser()
-    config.read('config.ini')
+    if len(sys.argv) > 1:
+        config_file = "conf/" + sys.argv[1]
+    else: 
+        config_file = 'conf/conf.ini'
 
-    gen_conf = config['GENERAL']
-    email_conf = config['EMAIL']
-    auth_conf = config['AUTH']
-    auth = (auth_conf['SiteUsername'],auth_conf['SitePassword'])
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    try:
+        gen_conf = config['GENERAL']
+        email_conf = config['EMAIL']
+        auth_conf = config['AUTH']
+        auth = (auth_conf['SiteUsername'],auth_conf['SitePassword'])
+    except KeyError as e:
+        log = "Unable to find config setting"
+        logging.error(log + str(e))
+        sys.exit(log)
 
     scan_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -201,7 +211,9 @@ def run():
             broken_links = check_links(site_map_file)
 
         if broken_links == 401:
-            sys.exit("The site you are trying to check requires authenticating. Please add the auth details in the config.ini file and try again.")
+            log = "The site you are trying to check requires authenticating. Please add the auth details in the config.ini file and try again."
+            logging.error(log)
+            sys.exit(log)
     
     else:
         log = "The file at {} could not be found. Please check the config and ensure the filepath is correct.".format(site_map_file)
