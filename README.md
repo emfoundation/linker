@@ -54,8 +54,9 @@ SitePassword| The password for the protected site -> **Plain Text**
 To run the script, ensure you have python (min <2.7) installed and run:
 `python3 linker.py`
 
-#### Multiple Sites
-You can also specifiy which config file to use, this is especially useful when you have multiple sites, and so a config can be set up for each site.
+#### MULTI CONFIGS
+You can pass the config file name as a Command line argument, this is useful for multiple sites with a config for each site. ie: 
+
 `python3 linker.py mysite.ini`
 
 `python3 linker.py mysecondsite.ini`
