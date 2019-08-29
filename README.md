@@ -34,7 +34,7 @@ LogfileDirectory| The directory where logs will be saved, ensure you have the co
 
 |Config option|Description|
 |-------------|-----------|
-EmailOutput|yes / no (default)
+EmailOutput|yes (default) / no
 AdminEmailAddress|The address of that emails will be sent from
 AdminEmailPassword|The password of the Admins email account -> **PLAIN TEXT!**
 RecipientEmailAddresses|The recipient(s) email where the output gets sent to. Separate multiple emails with ','
